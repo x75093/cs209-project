@@ -54,14 +54,17 @@ def getRTDataForMovie(row):
     return pd.Series(outSeries)
 
 # Load list of movies and get RT data for them
-min_year = 2013
+min_year = 2009
 month = 13
 data = pd.read_csv("movieBudgets.csv")
 data["ReleaseDate"] = data["ReleaseDate"].apply(lambda x: dt.strptime(x,"%Y-%m-%d").date())
 data["Year"] = data["ReleaseDate"].apply(lambda x: x.year)
 data["Month"] = data["ReleaseDate"].apply(lambda x: x.month)
 
-# subset to only get 2014 data
+# subset data and query Rotten Tomatoes
 data2 = data[(data["Year"] > min_year) & (data["Month"] < month)]
 data3 = data2.apply(getRTDataForMovie,1)
-data3.to_csv("movieRTAndBudgetData.csv",encoding="utf-8")
+
+# merge with numbers data and save
+data4 = pd.merge(data3,data)
+data4.to_csv("movieRTAndBudgetData.csv",encoding="utf-8",index=False)
